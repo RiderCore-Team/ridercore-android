@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "995352369048",
+    "project_id": "co-piloto-dd11b",
+    "storage_bucket": "co-piloto-dd11b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:995352369048:android:a303f42cd74329fd433ded",
+        "android_client_info": {
+          "package_name": "com.syntaxislab.copiloto"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXlE_WJlTEUHpJGhohi12CUoBbEqhEjdI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
