@@ -12,7 +12,20 @@
           "package_name": "com.syntaxislab.copiloto"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "995352369048-399ugdj1re8spldiphhvlgmfdce3jiva.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.syntaxislab.copiloto",
+            "certificate_hash": "ffd1275af5386b7e1635938e89d6ee22479589fc"
+          }
+        },
+        {
+          "client_id": "995352369048-81tmkbjmndn770pntofc5c2hvsbt1b7d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDXlE_WJlTEUHpJGhohi12CUoBbEqhEjdI"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "995352369048-81tmkbjmndn770pntofc5c2hvsbt1b7d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
