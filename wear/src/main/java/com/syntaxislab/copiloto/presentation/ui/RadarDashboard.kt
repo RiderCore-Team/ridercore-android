@@ -25,11 +25,15 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
-import com.syntaxislab.copiloto.presentation.theme.NeonCyan
-import com.syntaxislab.copiloto.presentation.theme.NeonFuchsia
-import com.syntaxislab.copiloto.presentation.theme.SolidBlack
+import com.syntaxislab.copiloto.presentation.theme.AmarilloAltaVisibilidad
+import com.syntaxislab.copiloto.presentation.theme.BlancoTexto
+import com.syntaxislab.copiloto.presentation.theme.GrisTextoSecundario
+import com.syntaxislab.copiloto.presentation.theme.NaranjaFuego
+import com.syntaxislab.copiloto.presentation.theme.NegroBase
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -45,12 +49,13 @@ data class TelemetryData(
 @Composable
 fun RadarDashboard(
     telemetryData: TelemetryData,
+    onOpenSos: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(SolidBlack),
+            .background(NegroBase),
         contentAlignment = Alignment.Center
     ) {
         // 1. Fondo: Radar Circular (Rings)
@@ -64,12 +69,12 @@ fun RadarDashboard(
                 text = telemetryData.speedKmh.toString(),
                 fontSize = 54.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (telemetryData.hazardAlert) Color.Red else Color.White
+                color = if (telemetryData.hazardAlert) Color.Red else BlancoTexto
             )
             Text(
                 text = "km/h",
                 fontSize = 14.sp,
-                color = Color.Gray
+                color = GrisTextoSecundario
             )
         }
 
@@ -82,12 +87,35 @@ fun RadarDashboard(
         if (telemetryData.hazardAlert) {
             HazardWarning()
         }
+
+        // 5. Botón de acceso a SOS manual en la parte inferior
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 10.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Button(
+                onClick = onOpenSos,
+                modifier = Modifier.size(width = 64.dp, height = 28.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFD32F2F),
+                    contentColor = BlancoTexto
+                )
+            ) {
+                Text(
+                    text = "SOS",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Black
+                )
+            }
+        }
     }
 }
 
 @Composable
 fun RadarBackground(hasHazard: Boolean) {
-    val radarColor = if (hasHazard) Color.Red.copy(alpha = 0.5f) else NeonCyan.copy(alpha = 0.3f)
+    val radarColor = if (hasHazard) Color.Red.copy(alpha = 0.5f) else NaranjaFuego.copy(alpha = 0.3f)
 
     Canvas(modifier = Modifier.fillMaxSize()) {
         val center = Offset(size.width / 2, size.height / 2)
@@ -132,9 +160,9 @@ fun LeaderDot(distance: Int) {
         val dotX = center.x + (dotRadiusOffset * cos(angleRad)).toFloat()
         val dotY = center.y + (dotRadiusOffset * sin(angleRad)).toFloat()
 
-        // Dibujamos el líder en color Fucsia (Secondary)
+        // Dibujamos el líder en color Amarillo Alta Visibilidad (Destacados)
         drawCircle(
-            color = NeonFuchsia,
+            color = AmarilloAltaVisibilidad,
             radius = 6.dp.toPx(),
             center = Offset(dotX, dotY)
         )
@@ -144,7 +172,7 @@ fun LeaderDot(distance: Int) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         Text(
             text = "Líder: ${distance}m",
-            color = NeonFuchsia,
+            color = AmarilloAltaVisibilidad,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 16.dp)

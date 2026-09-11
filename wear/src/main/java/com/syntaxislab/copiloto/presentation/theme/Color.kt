@@ -31,3 +31,10 @@ val HighVisYellow = AmarilloAltaVisibilidad
 val FireOrange = NaranjaFuego
 val TextWhite = BlancoTexto
 val TextSecondaryGray = GrisTextoSecundario
+
+// --- Compatibilidad hacia atrás ---
+val SolidBlack = NegroBase
+val DarkGray = NegroSuperficie
+val NeonCyan = NaranjaFuego
+val NeonFuchsia = AmarilloAltaVisibilidad
+

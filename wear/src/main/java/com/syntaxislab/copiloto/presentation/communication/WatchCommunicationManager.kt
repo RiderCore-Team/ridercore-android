@@ -176,4 +176,30 @@ class WatchCommunicationManager(private val context: Context) {
                 }
             }
     }
+
+    /**
+     * Envía evento de cancelación de alarma (falsa alarma o piloto a salvo).
+     */
+    fun sendSosCancelMessage() {
+        capabilityClient.getCapability(PHONE_CAPABILITY_NAME, CapabilityClient.FILTER_REACHABLE)
+            .addOnSuccessListener { capabilityInfo ->
+                val connectedNodes = capabilityInfo.nodes
+                if (connectedNodes.isEmpty()) {
+                    Log.d("WatchComm", "No hay celular conectado para notificar cancelación.")
+                    return@addOnSuccessListener
+                }
+
+                for (node in connectedNodes) {
+                    messageClient.sendMessage(
+                        node.id,
+                        "/sos_cancel",
+                        "SOS_CANCELLED".toByteArray()
+                    ).addOnSuccessListener {
+                        Log.d("WatchComm", "Mensaje de cancelación SOS enviado al nodo ${node.id}")
+                    }.addOnFailureListener { e ->
+                        Log.e("WatchComm", "Falló el envío de la cancelación SOS", e)
+                    }
+                }
+            }
+    }
 }
