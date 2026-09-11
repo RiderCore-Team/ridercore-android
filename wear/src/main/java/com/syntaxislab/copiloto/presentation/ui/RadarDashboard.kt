@@ -25,6 +25,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
 import com.syntaxislab.copiloto.presentation.theme.AmarilloAltaVisibilidad
@@ -47,6 +49,7 @@ data class TelemetryData(
 @Composable
 fun RadarDashboard(
     telemetryData: TelemetryData,
+    onOpenSos: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -83,6 +86,29 @@ fun RadarDashboard(
         // 4. Alerta de Peligro Gigante (Parpadeo)
         if (telemetryData.hazardAlert) {
             HazardWarning()
+        }
+
+        // 5. Botón de acceso a SOS manual en la parte inferior
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 10.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Button(
+                onClick = onOpenSos,
+                modifier = Modifier.size(width = 64.dp, height = 28.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFD32F2F),
+                    contentColor = BlancoTexto
+                )
+            ) {
+                Text(
+                    text = "SOS",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Black
+                )
+            }
         }
     }
 }
