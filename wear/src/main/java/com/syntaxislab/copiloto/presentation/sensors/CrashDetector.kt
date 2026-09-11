@@ -18,7 +18,7 @@ enum class FallState {
     SOS_TRIGGERED
 }
 
-class FallDetectionAlgorithm(private val context: Context) {
+class CrashDetector(private val context: Context) {
 
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
