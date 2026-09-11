@@ -1,10 +1,15 @@
 package com.syntaxislab.copiloto.presentation.communication
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.DataClient
+import com.google.android.gms.wearable.DataEvent
+import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
+import com.syntaxislab.copiloto.presentation.ui.TelemetryData
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -17,7 +22,7 @@ class WatchCommunicationManager(private val context: Context) {
     private val capabilityClient = Wearable.getCapabilityClient(context)
 
     // Definimos el nombre de la capacidad que debe tener la app del celular
-    // (Asegúrate de agregar esto en el res/values/wear.xml del celular más adelante)
+    // (Declarado en res/values/wear.xml del módulo app)
     private val PHONE_CAPABILITY_NAME = "copiloto_phone_app"
 
     /**
@@ -50,6 +55,86 @@ class WatchCommunicationManager(private val context: Context) {
     }
 
     /**
+     * Escucha en tiempo real la telemetría enviada por el celular a través de DataClient.
+     * Lee la ruta "/telemetry" y emite un nuevo TelemetryData ante cada cambio recibido.
+     */
+    fun monitorTelemetry(): Flow<TelemetryData> = callbackFlow {
+        val listener = DataClient.OnDataChangedListener { dataEvents ->
+            for (event in dataEvents) {
+                if (event.type == DataEvent.TYPE_CHANGED) {
+                    val item = event.dataItem
+                    if (item.uri.path == "/telemetry") {
+                        try {
+                            val dataMap = DataMapItem.fromDataItem(item).dataMap
+                            val speed = if (dataMap.containsKey("speedKmh")) {
+                                dataMap.getInt("speedKmh")
+                            } else {
+                                dataMap.getInt("speed", 0)
+                            }
+                            val leaderDist = if (dataMap.containsKey("leaderDistanceMeters")) {
+                                dataMap.getInt("leaderDistanceMeters")
+                            } else {
+                                dataMap.getInt("leaderDist", 0)
+                            }
+                            val hazard = dataMap.getBoolean("hazardAlert", false)
+
+                            trySend(
+                                TelemetryData(
+                                    speedKmh = speed,
+                                    leaderDistanceMeters = leaderDist,
+                                    hazardAlert = hazard
+                                )
+                            )
+                        } catch (e: Exception) {
+                            Log.e("WatchComm", "Error al procesar telemetría", e)
+                        }
+                    }
+                }
+            }
+        }
+
+        dataClient.addListener(listener)
+
+        // Consultamos el último dato recibido para tenerlo disponible de inmediato
+        dataClient.getDataItems(Uri.parse("wear://*/telemetry")).addOnSuccessListener { buffer ->
+            try {
+                for (item in buffer) {
+                    val dataMap = DataMapItem.fromDataItem(item).dataMap
+                    val speed = if (dataMap.containsKey("speedKmh")) {
+                        dataMap.getInt("speedKmh")
+                    } else {
+                        dataMap.getInt("speed", 0)
+                    }
+                    val leaderDist = if (dataMap.containsKey("leaderDistanceMeters")) {
+                        dataMap.getInt("leaderDistanceMeters")
+                    } else {
+                        dataMap.getInt("leaderDist", 0)
+                    }
+                    val hazard = dataMap.getBoolean("hazardAlert", false)
+
+                    trySend(
+                        TelemetryData(
+                            speedKmh = speed,
+                            leaderDistanceMeters = leaderDist,
+                            hazardAlert = hazard
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("WatchComm", "Error al leer telemetría inicial", e)
+            } finally {
+                buffer.release()
+            }
+        }.addOnFailureListener { e ->
+            Log.e("WatchComm", "Error al consultar telemetría inicial", e)
+        }
+
+        awaitClose {
+            dataClient.removeListener(listener)
+        }
+    }
+
+    /**
      * 1. DataClient: Sincroniza estados constantes (variables que viven en la nube local).
      * Manda el estado isWatchConnected = true/false al celular.
      */
@@ -57,10 +142,10 @@ class WatchCommunicationManager(private val context: Context) {
         val putDataReq = PutDataMapRequest.create("/watch_status").apply {
             dataMap.putBoolean("isWatchConnected", isConnected)
             dataMap.putLong("timestamp", System.currentTimeMillis()) // Forzamos actualización
-        }.asPutDataRequest()
+        }.asPutDataRequest().setUrgent()
 
         dataClient.putDataItem(putDataReq).addOnSuccessListener {
-            Log.d("WatchComm", "Estado sincronizado con DataClient: isConnected=\$isConnected")
+            Log.d("WatchComm", "Estado sincronizado con DataClient: isConnected=$isConnected")
         }.addOnFailureListener { e ->
             Log.e("WatchComm", "Error al sincronizar estado", e)
         }

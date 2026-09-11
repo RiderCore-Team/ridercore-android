@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Capacidad declarada para que el reloj identifique a la app del celular -->
+    <string-array name="android_wear_capabilities">
+        <item>copiloto_phone_app</item>
+    </string-array>
+</resources>
