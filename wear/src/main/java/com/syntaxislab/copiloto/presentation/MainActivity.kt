@@ -43,6 +43,8 @@ import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import androidx.wear.compose.ui.tooling.preview.WearPreviewFontScales
 import com.syntaxislab.copiloto.R
 import com.syntaxislab.copiloto.presentation.communication.WatchCommunicationManager
+import com.syntaxislab.copiloto.presentation.ui.RadarDashboard
+import com.syntaxislab.copiloto.presentation.ui.TelemetryData
 import com.syntaxislab.copiloto.presentation.theme.CopilotoTheme
 
 class MainActivity : ComponentActivity() {
@@ -60,65 +62,23 @@ fun WearApp(greetingName: String) {
         val context = LocalContext.current
         val communicationManager = remember { WatchCommunicationManager(context) }
         
-        // Colectamos el estado de conexión (por defecto asumimos false hasta verificar)
+        // Colectamos el estado de conexión con el teléfono
         val isPhoneConnected by communicationManager.monitorConnectionStatus().collectAsState(initial = false)
 
+        // Telemetría en tiempo real recibida desde el celular vía DataClient
+        val liveTelemetry by communicationManager.monitorTelemetry().collectAsState(
+            initial = TelemetryData()
+        )
+
         AppScaffold {
-            val listState = rememberTransformingLazyColumnState()
-            val transformationSpec = rememberTransformationSpec()
-            ScreenScaffold(
-                scrollState = listState,
-                edgeButton = {
-                    EdgeButton(
-                        onClick = { communicationManager.sendSosMessage() },
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                            ),
-                    ) {
-                        Text("SOS MANUAL")
-                    }
-                },
-            ) { contentPadding -> 
-                TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
-                    item {
-                        ListHeader(
-                            modifier =
-                                Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
-                            transformation = SurfaceTransformation(transformationSpec),
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                                Text(text = "Hola, $greetingName")
-                                
-                                // Si NO está conectado, mostramos el ícono rojo
-                                if (!isPhoneConnected) {
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Icon(
-                                        imageVector = Icons.Default.Warning,
-                                        contentDescription = "Celular desconectado",
-                                        tint = Color.Red
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    item {
-                        Button(
-                            onClick = { communicationManager.syncWatchState(true) },
-                            modifier = Modifier.fillMaxWidth()
-                                .transformedHeight(this, transformationSpec),
-                            transformation = SurfaceTransformation(transformationSpec),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        ) {
-                            Text("Forzar Sync Estado")
-                        }
-                    }
-                }
+            // Si el celular se encuentra desconectado, activamos alerta de peligro visual para advertir al piloto
+            val telemetryData = if (!isPhoneConnected) {
+                liveTelemetry.copy(hazardAlert = true)
+            } else {
+                liveTelemetry
             }
+
+            RadarDashboard(telemetryData = telemetryData)
         }
     }
 }
@@ -127,5 +87,14 @@ fun WearApp(greetingName: String) {
 @WearPreviewFontScales
 @Composable
 fun DefaultPreview() {
-    WearApp("Preview Android")
+    CopilotoTheme {
+        // En preview mostramos datos de prueba visuales para maquetar cómodamente
+        RadarDashboard(
+            telemetryData = TelemetryData(
+                speedKmh = 124,
+                leaderDistanceMeters = 150,
+                hazardAlert = false
+            )
+        )
+    }
 }
