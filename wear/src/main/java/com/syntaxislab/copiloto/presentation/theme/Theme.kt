@@ -1,26 +1,31 @@
 package com.syntaxislab.copiloto.presentation.theme
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.wear.compose.material3.ColorScheme
 import androidx.wear.compose.material3.MaterialTheme
 
-val NeonCyan = Color(0xFF00FFFF)
-val NeonFuchsia = Color(0xFFFF00FF)
-val SolidBlack = Color(0xFF000000)
-val DarkGray = Color(0xFF1A1A1A)
-
 val CopilotoWearColorScheme = ColorScheme(
-    primary = NeonCyan,
-    onPrimary = SolidBlack,
-    primaryContainer = DarkGray,
-    onPrimaryContainer = NeonCyan,
-    secondary = NeonFuchsia,
-    onSecondary = SolidBlack,
-    secondaryContainer = DarkGray,
-    onSecondaryContainer = NeonFuchsia,
-    background = SolidBlack,
-    onBackground = Color.White
+    primary = NaranjaFuego,
+    onPrimary = BlancoTexto,
+    primaryContainer = NegroSuperficie,
+    onPrimaryContainer = NaranjaFuego,
+    secondary = AmarilloAltaVisibilidad,
+    onSecondary = NegroBase,
+    secondaryContainer = NegroSuperficie,
+    onSecondaryContainer = AmarilloAltaVisibilidad,
+    tertiary = AmarilloAltaVisibilidad,
+    onTertiary = NegroBase,
+    tertiaryContainer = NegroSuperficie,
+    onTertiaryContainer = AmarilloAltaVisibilidad,
+    background = NegroBase,
+    onBackground = BlancoTexto,
+    surfaceContainer = NegroSuperficie,
+    surfaceContainerLow = NegroSuperficie,
+    surfaceContainerHigh = NegroSuperficie,
+    onSurface = BlancoTexto,
+    onSurfaceVariant = GrisTextoSecundario,
+    outline = GrisTextoSecundario,
+    outlineVariant = NegroSuperficie
 )
 
 @Composable
