@@ -109,6 +109,10 @@ fun WearApp(greetingName: String) {
                             modifier = Modifier.fillMaxWidth()
                                 .transformedHeight(this, transformationSpec),
                             transformation = SurfaceTransformation(transformationSpec),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
                         ) {
                             Text("Forzar Sync Estado")
                         }
