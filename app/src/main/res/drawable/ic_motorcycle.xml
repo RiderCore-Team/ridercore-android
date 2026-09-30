@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Outer Cyan Glow Circle for Visibility on Night Map -->
+    <path
+        android:fillColor="#00FFFF"
+        android:pathData="M12,2 C6.48,2 2,6.48 2,12 C2,17.52 6.48,22 12,22 C17.52,22 22,17.52 22,12 C22,6.48 17.52,2 12,2 Z"
+        android:alpha="0.3" />
+    <!-- Motorcycle Body Vector -->
+    <path
+        android:fillColor="#00FFFF"
+        android:pathData="M19.44,9.03L15.42,5.01C14.8,4.39 13.91,4 12.98,4H11.02C10.09,4 9.2,4.39 8.58,5.01L4.56,9.03C3.92,9.67 3.52,10.51 3.44,11.41C3.36,12.31 3.61,13.2 4.15,13.92L6.15,16.59C6.88,17.56 8,18.12 9.21,18.12H14.79C16,18.12 17.12,17.56 17.85,16.59L19.85,13.92C20.39,13.2 20.64,12.31 20.56,11.41C20.48,10.51 20.08,9.67 19.44,9.03ZM12,16C9.79,16 8,14.21 8,12C8,9.79 9.79,8 12,8C14.21,8 16,9.79 16,12C16,14.21 14.21,16 12,16Z" />
+</vector>

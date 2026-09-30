@@ -10,6 +10,7 @@ data class User(
     val emergencyPhone: String = "",
     val bloodType: String = "",
     val bikeModel: String = "",
+    val profileCompleted: Boolean = false,
     val createdAt: Timestamp? = null,
     val lastLogin: Timestamp? = null
 )

@@ -13,3 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Sensibles & Tokens
+.env
+google-services.json
+app/google-services.json
+wear/google-services.json
+app/src/main/res/values/mapbox_keys.xml

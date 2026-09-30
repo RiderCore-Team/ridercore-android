@@ -18,6 +18,8 @@ import com.google.android.gms.common.api.ApiException
 import com.syntaxislab.copiloto.screens.AuthViewModel
 import com.syntaxislab.copiloto.screens.LoginScreen
 import com.syntaxislab.copiloto.screens.LoginState
+import com.syntaxislab.copiloto.screens.MainDashboardScreen
+import com.syntaxislab.copiloto.screens.ProfileSetupScreen
 import com.syntaxislab.copiloto.ui.theme.CopilotoTheme
 
 class MainActivity : ComponentActivity() {
@@ -36,8 +38,6 @@ fun CopilotoApp(authViewModel: AuthViewModel = viewModel()) {
     val context = LocalContext.current
     val loginState by authViewModel.loginState.collectAsState()
 
-    // Configuración del cliente de Google Sign-In
-    // Firebase reconoce R.string.default_web_client_id gracias a tu google-services.json
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestIdToken(stringResource(R.string.default_web_client_id))
         .requestEmail()
@@ -45,7 +45,6 @@ fun CopilotoApp(authViewModel: AuthViewModel = viewModel()) {
 
     val googleSignInClient = GoogleSignIn.getClient(context, gso)
 
-    // Lanzador para atrapar el resultado de la ventana de selección de cuenta
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -60,8 +59,7 @@ fun CopilotoApp(authViewModel: AuthViewModel = viewModel()) {
         }
     }
 
-    // Observamos en qué estado se encuentra la autenticación
-    when (loginState) {
+    when (val state = loginState) {
         is LoginState.Idle -> {
             LoginScreen(
                 onGoogleSignInClick = {
@@ -70,18 +68,25 @@ fun CopilotoApp(authViewModel: AuthViewModel = viewModel()) {
             )
         }
         is LoginState.Loading -> {
-            // Mantiene la pantalla visible pero deshabilitamos el click temporalmente
             LoginScreen(onGoogleSignInClick = {})
         }
+        is LoginState.RequiresProfileSetup -> {
+            ProfileSetupScreen(
+                user = state.user,
+                onProfileSaved = {
+                    // El estado ya cambia automáticamente a LoginState.Success
+                },
+                authViewModel = authViewModel
+            )
+        }
         is LoginState.Success -> {
-            Toast.makeText(context, "¡Piloto Autenticado!", Toast.LENGTH_SHORT).show()
-            // TODO: En el futuro, aquí pondremos la navegación al mapa
+            MainDashboardScreen(
+                user = state.user,
+                authViewModel = authViewModel
+            )
         }
         is LoginState.Error -> {
-            val errorMessage = (loginState as LoginState.Error).message
-            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-
-            // Volvemos a mostrar la pantalla por si el piloto quiere volver a intentar
+            Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
             LoginScreen(
                 onGoogleSignInClick = {
                     launcher.launch(googleSignInClient.signInIntent)

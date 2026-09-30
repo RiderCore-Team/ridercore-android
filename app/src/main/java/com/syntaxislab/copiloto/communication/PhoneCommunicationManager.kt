@@ -6,6 +6,7 @@ import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.MessageClient
+import com.google.android.gms.wearable.NodeClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.channels.awaitClose
@@ -16,6 +17,7 @@ class PhoneCommunicationManager(private val context: Context) {
 
     private val dataClient: DataClient = Wearable.getDataClient(context)
     private val messageClient: MessageClient = Wearable.getMessageClient(context)
+    private val nodeClient: NodeClient = Wearable.getNodeClient(context)
 
     companion object {
         private const val TAG = "PhoneComm"
@@ -87,5 +89,21 @@ class PhoneCommunicationManager(private val context: Context) {
         awaitClose {
             messageClient.removeListener(listener)
         }
+    }
+
+    /**
+     * Obtiene la lista de nombres de los relojes Wear OS conectados activamente por Bluetooth/Wi-Fi
+     */
+    fun getConnectedWatchNodes(onResult: (List<String>) -> Unit) {
+        nodeClient.connectedNodes
+            .addOnSuccessListener { nodes ->
+                val nodeNames = nodes.map { it.displayName }
+                Log.d(TAG, "Nodos Wear OS conectados: $nodeNames")
+                onResult(nodeNames)
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error consultando nodos Wear OS", e)
+                onResult(emptyList())
+            }
     }
 }
